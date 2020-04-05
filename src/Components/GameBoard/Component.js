@@ -5,37 +5,59 @@ import { requestBoard } from '../../thunks/requestBoard';
 import Tile from '../Tile/Component';
 
 class GameBoard extends React.Component {
-  
+  constructor(props) {
+    super(props);
+    this.state = {
+      board: props.board
+    };
+  }
+
   componentDidMount() {
     const boardData = requestBoard();
   }
+
   
-  renderTile(i) {
+  renderTile(tile, coord) {
     return (
       <Tile
-        value={this.props.tiles[i]}
-        onClick={() => this.props.onClick(i)}
+        key={`${coord.x}${coord.y}`}
+        word={tile.word}
+        onClick={() => this.props.onClick(coord)}
       />
     );
   }
 
+  createBoard(boardData) {
+    console.log('new board data', boardData)
+    let boardDisplay = boardData.map((boardRowData, x) =>{
+      return boardRowData.map((tile, y) => {
+        return this.renderTile(tile, { x, y });
+      })
+    });
+    return boardDisplay;
+  }
+  
   render() {
+    const boardDisplay = this.createBoard(this.state.board);
+    console.log('rendering props', this.state.board)
+    // console.log('boardDisplay', this.props.board);
     return (
       <div>
+        <div> {this.props.board[0][0].word }</div>
         <div className="board-row">
-          {this.renderTile(0)}{this.renderTile(1)}{this.renderTile(2)}{this.renderTile(3)}{this.renderTile(4)}
+          {this.props.board[0].map((tile, y) => { this.renderTile(tile, { x: 0, y })})}
         </div>
         <div className="board-row">
-          {this.renderTile(5)}{this.renderTile(6)}{this.renderTile(7)}{this.renderTile(8)}{this.renderTile(9)}
+          {boardDisplay[1]}
         </div>
         <div className="board-row">
-          {this.renderTile(10)}{this.renderTile(11)}{this.renderTile(12)}{this.renderTile(13)}{this.renderTile(14)}
+          {boardDisplay[2]}
         </div>
         <div className="board-row">
-          {this.renderTile(15)}{this.renderTile(16)}{this.renderTile(17)}{this.renderTile(18)}{this.renderTile(19)}
+          {boardDisplay[3]}
         </div>
         <div className="board-row">
-          {this.renderTile(20)}{this.renderTile(21)}{this.renderTile(22)}{this.renderTile(23)}{this.renderTile(24)}
+          {boardDisplay[4]}
         </div>
       </div>
     );

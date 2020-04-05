@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './styles.css';
 
 import Role from '../Role/Component';
@@ -10,29 +10,50 @@ class Game extends React.Component {
     this.state = {
       history: [
         {
-          tiles: Array(25).fill(null)
+          board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]]
         }
       ],
+      board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
       stepNumber: 0,
       redIsNext: true,
       role: ''
     };
   }
 
-  handleClick(i) {
+  componendDidMount() {
+    fetch(`https://api.github.com/repos/gatsbyjs/gatsby`)
+      .then(response => response.json()) // parse JSON from request
+      .then(resultData => {
+        console.log(resultData)
+      }) // set data for the number of stars
+  }
+  // const [gameBoard, setgameBoard] = useState(0);
+  // useEffect(() => {
+  //   // get data from GitHub api
+  // }, []);
+
+
+  handleClick(coord) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
-    const tiles = current.tiles.slice();
+    const board = current.board.slice();
     // if (calculateWinner(tiles) || tiles[i]) {
     //   return;
     // }
-    tiles[i] = this.state.redIsNext ? "red" : "blue";
+    console.log('coord is', coord.x, coord.y);
+    console.log('toReveal before:', board[coord.x][coord.y].toReveal);
+    console.log('toreveal after click ', !board[coord.x][coord.y].toReveal);
+    const newBoard = this.state.board.slice();
+    newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y];
+    newBoard[coord.x][coord.y].word = 'test';
+    board[coord.x][coord.y].toReveal = !board[coord.x][coord.y].toReveal;
     this.setState({
       history: history.concat([
         {
-          tiles: tiles
+          board: board
         }
       ]),
+      board: [[{"word":"TEST","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
       stepNumber: history.length,
       redIsNext: !this.state.redIsNext
     });
@@ -84,8 +105,8 @@ class Game extends React.Component {
         <div className="game">
           <div className="game-board">
             <GameBoard
-              tiles={current.tiles}
-              onClick={i => this.handleClick(i)}
+              board={this.state.board}
+              onClick={coord => this.handleClick(coord)}
             />
           </div>
           <div className="game-info">
