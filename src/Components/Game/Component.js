@@ -21,10 +21,11 @@ class Game extends React.Component {
   }
 
   componendDidMount() {
-    fetch(`https://api.github.com/repos/gatsbyjs/gatsby`)
+    // console.log('wtf')
+    fetch(`https://localhost:8080/board`)
       .then(response => response.json()) // parse JSON from request
       .then(resultData => {
-        console.log(resultData)
+        // console.log('board', resultData)
       }) // set data for the number of stars
   }
   // const [gameBoard, setgameBoard] = useState(0);
@@ -69,7 +70,8 @@ class Game extends React.Component {
     if (role === '') {
       alert('Please choose a role')
     } else {
-      if (role === 'redSpyMaster' || role === 'blueyMaster') {
+      const history = this.state.history.slice(0, this.state.stepNumber + 1);
+      if (role === 'redSpyMaster' || role === 'blueSpyMaster') {
         const newBoard = this.state.board.map((boardRow) => {
           return boardRow.map(tile => {
             return { ...tile, toReveal: true };
@@ -77,6 +79,13 @@ class Game extends React.Component {
         });
         this.setState({
           role,
+          history: history.concat([
+            {
+              board: newBoard
+            }
+          ]),
+          board: newBoard,
+          stepNumber: history.length,
           board: newBoard
         })
       } else {
