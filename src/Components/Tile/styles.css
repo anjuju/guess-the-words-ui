@@ -4,7 +4,6 @@
 }
 
 .tile {
-  background: var(--secondary-color);
   border: 1px solid #999;
   float: left;
   font-weight: bold;

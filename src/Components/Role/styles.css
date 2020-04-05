@@ -9,9 +9,16 @@
 .role__container {
   display: grid;
   grid-template-columns: 50% 50%;
-  grid-template-rows: 50% 50%;
+  /* grid-template-rows: 6vh 6vh; */
 
   list-style: none;
+  align-items: center;
+}
+
+.role {
+  border: 1px solid white;
+  border-radius: 10px;
+  padding: 1vw;
 }
 
 .role > label {

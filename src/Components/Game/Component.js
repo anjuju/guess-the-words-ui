@@ -5,15 +5,12 @@ import Role from '../Role/Component';
 import GameBoard from '../GameBoard/Component';
 
 class Game extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
-      role: '',
-    };
-  }
-
   
+  state = {
+    board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
+    role: '',
+  }
+   
   componentDidMount() {
     fetch(`http://localhost:8080/board`)
       .then(response => {
@@ -22,7 +19,7 @@ class Game extends React.Component {
       }) // parse JSON from request
       .then(resultData => {
         console.log('resultData', resultData);
-        if (resultData.message == "please create a new board first!") {
+        if (resultData.message === "please create a new board first!") {
           fetch('http://localhost:8080/board', {
             method: 'post',
             headers: {
@@ -41,25 +38,26 @@ class Game extends React.Component {
     })
   }
 
-  handleClick(coord) {
+  handleClick = (coord) => {
     // if (calculateWinner(tiles) || tiles[i]) {
     //   return;
     // }
     const newBoard = this.state.board.slice();
-    newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y].toReveal;
-    console.log('send sio message');
-    // this.props.sendSioMessage();
+    if (!newBoard[coord.x][coord.y].toReveal) {
+      newBoard[coord.x][coord.y].toReveal = true;
+    }
+    //newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y].toReveal;
     this.setState({
       board: newBoard,
     });
+    
+    if (newBoard[coord.x][coord.y].color === "black") {
+      alert("You clicked the assassin! Sorry, you lose!");
+      this.revealBoard();
+    }
+    // console.log('send sio message');
+    // this.props.sendSioMessage();
   }
-
-  // jumpTo(step) {
-  //   this.setState({
-  //     stepNumber: step,
-  //     redIsNext: (step % 2) === 0
-  //   });
-  // }
 
   handleNewGame = () => {
     fetch('http://localhost:8080/board', {
@@ -80,45 +78,35 @@ class Game extends React.Component {
       alert('Please choose a role')
     } else {
       if (role === 'redSpyMaster' || role === 'blueSpyMaster') {
-        const newBoard = this.state.board.map((boardRow) => {
-          return boardRow.map(tile => {
-            return { ...tile, toReveal: true };
-          })
-        });
-        this.setState({
-          role,
-          board: newBoard
-        })
-      } else {
-        this.setState({
-          role
-        });
+        this.revealBoard();
       }
+      this.setState({
+        role
+      });
       // setTimeout(()=>console.log("role (game):", this.state.role),0);
     }
   }
 
+  revealBoard = () => {
+    const newBoard = this.state.board.map((boardRow) => {
+      return boardRow.map(tile => {
+        return { ...tile, toReveal: true };
+      })
+    });
+    this.setState({
+      board: newBoard
+    });
+    setTimeout(()=>console.log("reveal board:", this.state.board),0);
+  }
+
   render() {
 
-    // const winner = calculateWinner(current.tiles);
-
-    // const moves = history.map((step, move) => {
-    //   const desc = move ?
-    //     'Go to move #' + move :
-    //     'Go to game start';
-    //   return (
-    //     <li key={move}>
-    //       <button onClick={() => this.jumpTo(move)}>{desc}</button>
-    //     </li>
-    //   );
-    // });
-
-    let status;
-    // if (winner) {
-    //   status = "Winner: " + winner;
-    // } else {
-      status = "Next player: " + (this.state.redIsNext ? "red" : "blue");
-    // }
+    // let status;
+    // // if (winner) {
+    // //   status = "Winner: " + winner;
+    // // } else {
+    //   status = "Next team: " + (this.state.redIsNext ? "red" : "blue");
+    // // }
 
     if (this.state.role) {
       return (
@@ -129,11 +117,11 @@ class Game extends React.Component {
               onClick={coord => this.handleClick(coord)}
             />
           </div>
-          <button onClick={() => this.handleNewGame()}> New Game </button>
-          <div className="game-info">
+          {/* <div className="game-info">
             <div>{status}</div>
-            {/* <ol>{moves}</ol> */}
-          </div>
+          </div> */}
+          <button className="btn-newGame" onClick={() => this.handleNewGame()}> New Game </button>
+          <button onClick={this.revealBoard}> Reveal Board </button>
         </div>
       );
     } else {

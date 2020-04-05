@@ -1,6 +1,8 @@
 :root {
   --red: #cc0000;
   --blue: #0099ff;
+  --neutral:  #6600cc;
+  --assassin: url("./img/assassin.png");
   --bg-color: #292c38;
   --secondary-color: #363a49;
 }
@@ -13,29 +15,34 @@
   justify-content: space-between;
   align-items: center;
 
-  width: 100vw;
-  height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
   background-color: var(--bg-color);
   color: white; 
 }
 
 .red {
-  color: var(--red);
+  background-color: var(--red);
 }
 
 .blue {
-  color: var(--blue);
+  background-color: var(--blue);
 }
 
 .black {
-  color: purple;
+  background: var(--assassin);
+  background-size: 100% 100%;
 }
 
 .neutral {
-  color: white;
+  background-color: var(--neutral);
 }
 
 button {
   font-size: 28px;
   border-radius: 5px;
+  color: white;
+  background-color: #363a49;
+  padding: 1vw;
+  /* margin: 1vw; */
 }
