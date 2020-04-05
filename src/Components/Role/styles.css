@@ -1,0 +1,29 @@
+.role-section__container {
+  width: 60vw;
+  border: 5px double white;
+  border-radius: 10px;
+  padding-bottom: 2vw;
+  background-color: var(--secondary-color);
+}
+
+.role__container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 50% 50%;
+
+  list-style: none;
+}
+
+.role > label {
+  cursor: pointer;
+}
+
+input[type="radio"] {
+  width: 1vw;
+  height: 1vw;
+  min-width: 20px;
+  min-height: 20px;
+  vertical-align: middle;
+  margin-right: 1vw;
+  cursor: pointer
+}

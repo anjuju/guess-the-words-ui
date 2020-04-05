@@ -1,0 +1,33 @@
+:root {
+  --red: #cc0000;
+  --blue: #0099ff;
+  --bg-color: #292c38;
+  --secondary-color: #363a49;
+}
+
+.App {
+  text-align: center;
+  font-size: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-color);
+  color: white; 
+}
+
+.red {
+  color: var(--red);
+}
+
+.blue {
+  color: var(--blue);
+}
+
+button {
+  font-size: 28px;
+  border-radius: 5px;
+}
