@@ -32,7 +32,7 @@ function App() {
       <header>
         <h1>Guess the Words</h1>
       </header>
-      <Game />
+      <Game sendSioMessage={sendMessage}/>
       <footer>
         <p>Coded by John and Angelica</p>
       </footer>

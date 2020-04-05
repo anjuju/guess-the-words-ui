@@ -8,54 +8,49 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      history: [
-        {
-          board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]]
-        }
-      ],
       board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
-      stepNumber: 0,
-      redIsNext: true,
-      role: ''
+      role: '',
     };
   }
 
-  componendDidMount() {
-    // console.log('wtf')
-    fetch(`https://localhost:8080/board`)
-      .then(response => response.json()) // parse JSON from request
+  
+  componentDidMount() {
+    fetch(`http://localhost:8080/board`)
+      .then(response => {
+        // console.log(response);
+        return response.json() 
+      }) // parse JSON from request
       .then(resultData => {
-        // console.log('board', resultData)
-      }) // set data for the number of stars
-  }
-  // const [gameBoard, setgameBoard] = useState(0);
-  // useEffect(() => {
-  //   // get data from GitHub api
-  // }, []);
+        console.log('resultData', resultData);
+        if (resultData.message == "please create a new board first!") {
+          fetch('http://localhost:8080/board', {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json, text/plain, */*',
+              'Content-Type': 'application/json'
+            }
+          })
+            .then(res=>res.json())
+            .then(res => {
+              this.setState({ board: res.board})
+            });
+        } else {
+          this.setState({ board: resultData.board})
+        }
 
+    })
+  }
 
   handleClick(coord) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
-    const board = current.board.slice();
     // if (calculateWinner(tiles) || tiles[i]) {
     //   return;
     // }
-    console.log('coord is', coord.x, coord.y);
-    console.log('toReveal before:', board[coord.x][coord.y].toReveal);
-    console.log('toreveal after click ', !board[coord.x][coord.y].toReveal);
     const newBoard = this.state.board.slice();
     newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y].toReveal;
-    board[coord.x][coord.y].toReveal = !board[coord.x][coord.y].toReveal;
+    console.log('send sio message');
+    // this.props.sendSioMessage();
     this.setState({
-      history: history.concat([
-        {
-          board: board
-        }
-      ]),
       board: newBoard,
-      stepNumber: history.length,
-      redIsNext: !this.state.redIsNext
     });
   }
 
@@ -66,11 +61,24 @@ class Game extends React.Component {
   //   });
   // }
 
+  handleNewGame = () => {
+    fetch('http://localhost:8080/board', {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(res=>res.json())
+      .then(res => {
+        window.location.reload();
+      });
+  }
+
   handleRoleSubmit = (role) => {
     if (role === '') {
       alert('Please choose a role')
     } else {
-      const history = this.state.history.slice(0, this.state.stepNumber + 1);
       if (role === 'redSpyMaster' || role === 'blueSpyMaster') {
         const newBoard = this.state.board.map((boardRow) => {
           return boardRow.map(tile => {
@@ -79,13 +87,6 @@ class Game extends React.Component {
         });
         this.setState({
           role,
-          history: history.concat([
-            {
-              board: newBoard
-            }
-          ]),
-          board: newBoard,
-          stepNumber: history.length,
           board: newBoard
         })
       } else {
@@ -98,8 +99,7 @@ class Game extends React.Component {
   }
 
   render() {
-    const history = this.state.history;
-    const current = history[this.state.stepNumber];
+
     // const winner = calculateWinner(current.tiles);
 
     // const moves = history.map((step, move) => {
@@ -125,10 +125,11 @@ class Game extends React.Component {
         <div className="game">
           <div className="game-board">
             <GameBoard
-              board={current.board}
+              board={this.state.board}
               onClick={coord => this.handleClick(coord)}
             />
           </div>
+          <button onClick={() => this.handleNewGame()}> New Game </button>
           <div className="game-info">
             <div>{status}</div>
             {/* <ol>{moves}</ol> */}
