@@ -43,7 +43,7 @@ class GameBoard extends React.Component {
     // console.log('boardDisplay', this.props.board);
     return (
       <div>
-        <div> {this.props.board[0][0].word }</div>
+        {/* <div> {this.props.board[0][0].word }</div> */}
         <div className="board-row">
           {this.props.board[0].map((tile, y) => { this.renderTile(tile, { x: 0, y })})}
         </div>

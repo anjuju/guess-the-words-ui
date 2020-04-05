@@ -24,9 +24,9 @@ class Tile extends React.Component {
 
 // const Tile = (props) => (
 //   <button
-//     className={`tile ${props.toReveal ? props.color : ''}`}
+//     className={`tile ${props.tile.toReveal ? props.tile.color : ''}`}
 //     onClick={() => props.onClick()}>
-//     {props.word}
+//     {props.tile.word}
 //   </button>
 // );
 
