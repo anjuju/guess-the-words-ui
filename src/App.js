@@ -34,7 +34,7 @@ function App() {
       </header>
       <Game sendSioMessage={sendMessage}/>
       <footer>
-        <p>Coded by John and Angelica (mostly John)</p>
+        <p>Coded by John and Angelica</p>
       </footer>
     </div>
   );

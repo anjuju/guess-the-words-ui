@@ -16,7 +16,7 @@ const GameBoard = (props) => {
   };
 
   const createBoard = (boardData) => {
-    console.log('new board data', boardData);
+    // console.log('new board data', boardData);
     let boardDisplay = boardData.map((boardRowData, x) =>{
       return boardRowData.map((tile, y) => {
         return renderTile(tile, { x, y });
@@ -26,8 +26,8 @@ const GameBoard = (props) => {
   };
   
   const boardDisplay = createBoard(props.board);
-  console.log('rendering props', props.board);
-  
+  // console.log('rendering props', props.board);
+
   return (
     <div>
       <div className="board-row">

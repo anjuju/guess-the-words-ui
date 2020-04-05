@@ -121,7 +121,7 @@ class Game extends React.Component {
             <div>{status}</div>
           </div> */}
           <button className="btn-newGame" onClick={() => this.handleNewGame()}> New Game </button>
-          <button onClick={this.revealBoard}> Reveal Board </button>
+          {(this.state.role === "redGuesser" || this.state.role === "blueGuesser") && <button onClick={this.revealBoard}> Reveal Board </button>}
         </div>
       );
     } else {
