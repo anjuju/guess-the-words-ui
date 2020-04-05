@@ -21,7 +21,7 @@ class GameBoard extends React.Component {
     return (
       <Tile
         key={`${coord.x}${coord.y}`}
-        word={tile.word}
+        tile={tile}
         onClick={() => this.props.onClick(coord)}
       />
     );
@@ -45,7 +45,7 @@ class GameBoard extends React.Component {
       <div>
         {/* <div> {this.props.board[0][0].word }</div> */}
         <div className="board-row">
-          {this.props.board[0].map((tile, y) => { this.renderTile(tile, { x: 0, y })})}
+          {boardDisplay[0]}
         </div>
         <div className="board-row">
           {boardDisplay[1]}

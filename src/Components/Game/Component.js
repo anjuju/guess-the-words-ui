@@ -44,8 +44,7 @@ class Game extends React.Component {
     console.log('toReveal before:', board[coord.x][coord.y].toReveal);
     console.log('toreveal after click ', !board[coord.x][coord.y].toReveal);
     const newBoard = this.state.board.slice();
-    newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y];
-    newBoard[coord.x][coord.y].word = 'test';
+    newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y].toReveal;
     board[coord.x][coord.y].toReveal = !board[coord.x][coord.y].toReveal;
     this.setState({
       history: history.concat([
@@ -53,7 +52,7 @@ class Game extends React.Component {
           board: board
         }
       ]),
-      board: [[{"word":"TEST","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
+      board: newBoard,
       stepNumber: history.length,
       redIsNext: !this.state.redIsNext
     });
@@ -70,9 +69,21 @@ class Game extends React.Component {
     if (role === '') {
       alert('Please choose a role')
     } else {
-      this.setState({
-        role
-      });
+      if (role === 'redSpyMaster' || role === 'blueyMaster') {
+        const newBoard = this.state.board.map((boardRow) => {
+          return boardRow.map(tile => {
+            return { ...tile, toReveal: true };
+          })
+        });
+        this.setState({
+          role,
+          board: newBoard
+        })
+      } else {
+        this.setState({
+          role
+        });
+      }
       // setTimeout(()=>console.log("role (game):", this.state.role),0);
     }
   }
@@ -105,7 +116,7 @@ class Game extends React.Component {
         <div className="game">
           <div className="game-board">
             <GameBoard
-              board={this.state.board}
+              board={current.board}
               onClick={coord => this.handleClick(coord)}
             />
           </div>

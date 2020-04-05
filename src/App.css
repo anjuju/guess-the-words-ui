@@ -27,6 +27,14 @@
   color: var(--blue);
 }
 
+.black {
+  color: purple;
+}
+
+.neutral {
+  color: white;
+}
+
 button {
   font-size: 28px;
   border-radius: 5px;

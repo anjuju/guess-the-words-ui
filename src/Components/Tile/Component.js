@@ -5,18 +5,16 @@ class Tile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      toReveal: props.toReveal,
-      word: props.word,
-      color: props.color
+      tile: props.tile
     };
   }
 
   render() {
     return (
       <button
-        className={`tile ${this.state.toReveal ? this.state.color : ''}`}
+        className={`tile ${this.state.tile.toReveal ? this.state.tile.color : ''}`}
         onClick={() => this.props.onClick()}>
-        {this.state.word}
+        {this.state.tile.word}
       </button>
     )
   }
