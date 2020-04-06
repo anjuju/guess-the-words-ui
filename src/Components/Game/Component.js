@@ -43,10 +43,10 @@ class Game extends React.Component {
     //   return;
     // }
     const newBoard = this.state.board.slice();
-    if (!newBoard[coord.x][coord.y].toReveal) {
-      newBoard[coord.x][coord.y].toReveal = true;
-    }
-    //newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y].toReveal;
+    // if (!newBoard[coord.x][coord.y].toReveal) {
+    //   newBoard[coord.x][coord.y].toReveal = true;
+    // }
+    newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y].toReveal;
     this.setState({
       board: newBoard,
     });
