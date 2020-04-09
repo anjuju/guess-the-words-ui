@@ -15,11 +15,17 @@ const GameBoard = (props) => {
     );
   };
 
+
+
   const createBoard = (boardData) => {
     // console.log('new board data', boardData);
     let boardDisplay = boardData.map((boardRowData, x) =>{
       return boardRowData.map((tile, y) => {
-        return renderTile(tile, { x, y });
+        const newTile = {...tile};
+        if (props.role === 'redSpyMaster' || props.role === 'blueSpyMaster') {
+          newTile.toReveal = !newTile.toReveal;
+        }
+        return renderTile(newTile, { x, y });
       })
     });
     return boardDisplay;

@@ -4,6 +4,14 @@ import './styles.css';
 import Role from '../Role/Component';
 import GameBoard from '../GameBoard/Component';
 
+/* Socket IO */
+import socketIOClient from 'socket.io-client';
+const socketEndPoint = 'http://localhost:8080/';
+
+// Connect to the socket
+const socket = socketIOClient(socketEndPoint); 
+
+
 class Game extends React.Component {
   
   state = {
@@ -14,19 +22,20 @@ class Game extends React.Component {
    
   componentDidMount() {
     fetch(`http://localhost:8080/board`)
-      .then(response => {
-        // console.log(response);
-        return response.json() 
+      .then(res => {
+        // console.log(res);
+        return res.json() 
       }) // parse JSON from request
       .then(resultData => {
-        console.log('resultData', resultData);
+        //console.log('resultData', resultData);
         if (resultData.message === "please create a new board first!") {
           fetch('http://localhost:8080/board', {
             method: 'post',
             headers: {
               'Accept': 'application/json, text/plain, */*',
               'Content-Type': 'application/json'
-            }
+            },
+            //body: JSON.stringify(data)
           })
             .then(res=>res.json())
             .then(res => {
@@ -36,8 +45,10 @@ class Game extends React.Component {
           this.setState({ board: resultData.board})
         }
     });
-    this.props.socket.on('tileClicked', data => {
-      this.updateBoard(data.coord);
+    socket.on('tileClicked', data => {
+      this.setState({
+        board: data.board
+      });
     })
   }
 
@@ -55,15 +66,12 @@ class Game extends React.Component {
       alert("You clicked the assassin! Sorry, you lose!");
       this.revealBoard();
     }
-  }
 
-  handleClick = (coord) => {
-    this.props.socket.emit('clickTile', {
+    socket.emit('clickTile', {
+      room: this.state.room,
+      board: this.state.board,
       coord,
-      room: this.state.room
     });
-
-    this.updateBoard(coord);
   }
 
   handleNewGame = () => {
@@ -84,9 +92,9 @@ class Game extends React.Component {
     if (role === '') {
       alert('Please choose a role')
     } else {
-      if (role === 'redSpyMaster' || role === 'blueSpyMaster') {
-        this.revealBoard();
-      }
+      // if (role === 'redSpyMaster' || role === 'blueSpyMaster') {
+      //   this.revealBoard();
+      // }
       this.setState({
         role
       });
@@ -96,8 +104,8 @@ class Game extends React.Component {
 
   handleCreateNewGame = (role) => {
     console.log('creating new game');
-    this.props.socket.emit('createGame');
-    this.props.socket.on('newGame', data => {
+    socket.emit('createGame', { role: this.state.role });
+    socket.on('newGame', data => {
       this.setState({
         room: data.room
       });
@@ -106,11 +114,17 @@ class Game extends React.Component {
   }
 
   handleJoinGame = (role, room) => {
-    console.log('room', room);
-    this.props.socket.emit('joinGame', { role, room })
+    console.log('joining room', room);
+    socket.emit('joinGame', { role, room })
     this.setState({
       room
     });
+    // already set this on componentDidMount 
+    // socket.on('joiningGame', data => {
+    //   this.setState({
+    //     board: data.board
+    //   })
+    //})
     this.handleRoleSubmit(role);
   }
 
@@ -120,10 +134,11 @@ class Game extends React.Component {
         return { ...tile, toReveal: true };
       })
     });
+
     this.setState({
       board: newBoard
     });
-    setTimeout(()=>console.log("reveal board:", this.state.board),0);
+    //setTimeout(()=>console.log("reveal board:", this.state.board),0);
   }
 
   render() {
@@ -139,9 +154,11 @@ class Game extends React.Component {
       return (
         <div className="game">
           <div className="game-board">
+            <div>Role: {this.state.role}</div>
             <GameBoard
               board={this.state.board}
-              onClick={coord => this.handleClick(coord)}
+              onClick={coord => this.updateBoard(coord)}
+              role={this.state.role}
             />
           </div>
           <div className="gameID">Please share your game ID with friends: {this.state.room}</div>
