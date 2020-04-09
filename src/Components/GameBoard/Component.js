@@ -22,7 +22,7 @@ const GameBoard = (props) => {
     let boardDisplay = boardData.map((boardRowData, x) =>{
       return boardRowData.map((tile, y) => {
         const newTile = {...tile};
-        if (props.role === 'redSpyMaster' || props.role === 'blueSpyMaster') {
+        if (props.role.type === 'spymaster') {
           newTile.toReveal = !newTile.toReveal;
         }
         return renderTile(newTile, { x, y });

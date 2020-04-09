@@ -39,10 +39,14 @@
 }
 
 button {
-  font-size: 28px;
+  font-size: 2vw;
   border-radius: 5px;
   color: white;
   background-color: #363a49;
   padding: 1vw;
   /* margin: 1vw; */
+}
+
+div {
+  margin: 1.5vw;
 }

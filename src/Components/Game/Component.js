@@ -16,7 +16,7 @@ class Game extends React.Component {
   
   state = {
     board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
-    role: '',
+    role: {},
     roomId: '',
   }
    
@@ -63,7 +63,7 @@ class Game extends React.Component {
     });
     
     if (newBoard[coord.x][coord.y].color === "black") {
-      alert("You clicked the assassin! Sorry, you lose!");
+      alert("The assassin was clicked! Game over!");
       this.revealBoard();
     }
 
@@ -88,13 +88,10 @@ class Game extends React.Component {
       });
   }
 
-  handleRoleSubmit = (role) => {
-    if (role === '') {
-      alert('Please choose a role')
+  handleRoleSubmit = (role) => {   
+    if (!role.type) {
+      alert('Please choose a role');
     } else {
-      // if (role === 'redSpyMaster' || role === 'blueSpyMaster') {
-      //   this.revealBoard();
-      // }
       this.setState({
         role
       });
@@ -131,7 +128,13 @@ class Game extends React.Component {
   revealBoard = () => {
     const newBoard = this.state.board.map((boardRow) => {
       return boardRow.map(tile => {
-        return { ...tile, toReveal: true };
+        if (this.state.role.type === "guesser") {
+          return { ...tile, toReveal: true };
+        } else {
+          // for spymasters... this will be inverted in GameBoard
+          return { ...tile, toReveal: false };
+        }
+        
       })
     });
 
@@ -150,23 +153,21 @@ class Game extends React.Component {
     //   status = "Next team: " + (this.state.redIsNext ? "red" : "blue");
     // // }
 
-    if (this.state.role) {
+    if (this.state.role.type) {
       return (
         <div className="game">
-          <div className="game-board">
-            <div>Role: {this.state.role}</div>
-            <GameBoard
-              board={this.state.board}
-              onClick={coord => this.updateBoard(coord)}
-              role={this.state.role}
-            />
-          </div>
+          <div className={`role ${this.state.role.color}`}>Role: {this.state.role.color} {this.state.role.type}</div>
+          <GameBoard
+            board={this.state.board}
+            onClick={coord => this.updateBoard(coord)}
+            role={this.state.role}
+          />
           <div className="gameID">Please share your game ID with friends: {this.state.room}</div>
-          {/* <div className="game-info">
-            <div>{status}</div>
-          </div> */}
-          <button className="btn-newGame" onClick={this.handleNewGame}> New Game </button>
-          {(this.state.role === "redGuesser" || this.state.role === "blueGuesser") && <button onClick={this.revealBoard}> Reveal Board </button>}
+          <div className="game-btns">
+            <button onClick={this.handleNewGame}> New Game </button>
+            <button onClick={this.revealBoard}> Reveal Board </button>
+          </div>
+          
         </div>
       );
     } else {

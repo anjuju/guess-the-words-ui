@@ -5,13 +5,21 @@ import './styles.css';
 class Role extends React.Component {
 
   state = {
-    role: '',
+    role: {},
     roomId: '',
   }
 
   handleRoleClick = (event) => {
+    let roleColor;
+    let roleType;
+
+    (event.target.id === 'redSpyMaster' || event.target.id === 'redGuesser') ? roleColor = 'red' : roleColor = 'blue';
+    (event.target.id === 'redSpyMaster' || event.target.id === 'blueSpyMaster') ? roleType = 'spymaster' : roleType = 'guesser';
     this.setState({
-      role: event.target.id
+      role : {
+        type: roleType,
+        color: roleColor
+      }
     });
     // setTimeout(()=>console.log("role (state):", this.state.role),0);
   }
