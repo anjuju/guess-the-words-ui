@@ -17,7 +17,7 @@ class Game extends React.Component {
   state = {
     board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
     role: {},
-    roomId: '',
+    // roomId: '',
   }
    
   componentDidMount() {
@@ -68,13 +68,13 @@ class Game extends React.Component {
     }
 
     socket.emit('clickTile', {
-      room: this.state.room,
+      // room: this.state.room,
       board: this.state.board,
       coord,
     });
   }
 
-  handleNewGame = () => {
+  handleNewBoard = () => {
     fetch('http://localhost:8080/board', {
       method: 'DELETE',
       headers: {
@@ -102,20 +102,20 @@ class Game extends React.Component {
   handleCreateNewGame = (role) => {
     console.log('creating new game');
     socket.emit('createGame', { role: this.state.role });
-    socket.on('newGame', data => {
-      this.setState({
-        room: data.room
-      });
-    });
+    // socket.on('newGame', data => {
+    //   this.setState({
+    //     room: data.room
+    //   });
+    // });
     this.handleRoleSubmit(role);
   }
 
-  handleJoinGame = (role, room) => {
-    console.log('joining room', room);
-    socket.emit('joinGame', { role, room })
-    this.setState({
-      room
-    });
+  handleJoinGame = (role) => {
+    // console.log('joining room', room);
+    socket.emit('joinGame', { role });
+    // this.setState({
+    //   room
+    // });
     // already set this on componentDidMount 
     // socket.on('joiningGame', data => {
     //   this.setState({
@@ -162,9 +162,9 @@ class Game extends React.Component {
             onClick={coord => this.updateBoard(coord)}
             role={this.state.role}
           />
-          <div className="gameID">Please share your game ID with friends: {this.state.room}</div>
+          {/* <div className="gameID">Please share your game ID with friends: {this.state.room}</div> */}
           <div className="game-btns">
-            <button onClick={this.handleNewGame}> New Game </button>
+            <button onClick={this.handleNewBoard}> Change Board </button>
             <button onClick={this.revealBoard}> Reveal Board </button>
           </div>
           
