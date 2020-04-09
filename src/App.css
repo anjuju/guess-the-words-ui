@@ -9,7 +9,7 @@
 
 .App {
   text-align: center;
-  font-size: 32px;
+  font-size: 2vw;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

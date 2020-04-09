@@ -12,13 +12,17 @@ const socket = socketIOClient(socketEndPoint);
 const dataKey = 'incoming data';
 
 const sendData = function() {
-  socket.emit(dataKey, 'data');
+  socket.emit(dataKey, 'data: ' + Math.random());
 }
 
 const recepData = function() {
   //Listen for data on the "outgoing data" namespace
   //and supply a callback for what to do when we get one
-  socket.on('outgoing data', data => console.log(data))
+  socket.on('outgoing data', data => alert(data))
+}
+
+const newPlayer = function() {
+  socket.emit('newPlayer');
 }
 
 // const ns= 'public_chat';
@@ -37,18 +41,16 @@ const recepData = function() {
 
 function App() {
   // useEffect(() => recepMessage() , [])
-  useEffect(() => recepData() , [])
+  useEffect(() => recepData());
   return (
     <div className="App">
-      {/* <div className="App">
-        <button style={{marginTop: '50', padding: '10px'}} onClick={sendMessage}>
-          Send message
-        </button>
-      </div> */}
+      <button style={{marginTop: '50', padding: '10px'}} onClick={sendData}>
+        Send data
+      </button>
       <header>
         <h1>Guess the Words</h1>
       </header>
-      <Game sendSioData={sendData}/>
+      <Game socket={socket} sendSioData={sendData}/>
       <footer>
         <p>Coded by John and Angelica</p>
       </footer>

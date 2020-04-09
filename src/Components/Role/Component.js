@@ -5,7 +5,8 @@ import './styles.css';
 class Role extends React.Component {
 
   state = {
-    role: ''
+    role: '',
+    roomId: '',
   }
 
   handleRoleClick = (event) => {
@@ -13,6 +14,12 @@ class Role extends React.Component {
       role: event.target.id
     });
     // setTimeout(()=>console.log("role (state):", this.state.role),0);
+  }
+
+  handleRoomId = (event) => {
+    this.setState({
+      roomId: event.target.value
+    })
   }
 
   render() {
@@ -37,7 +44,9 @@ class Role extends React.Component {
             <label htmlFor="blueSpyMaster">I am a blue spymaster</label>
           </li>
         </ul>
-        <button type="submit" onClick={()=>this.props.onSubmit(this.state.role)}>Begin Game</button>
+        <button type="submit" onClick={()=>this.props.onNewGame(this.state.role)}>New Game</button>
+        <input type="text" placeholder="Enter Game ID" onChange={this.handleRoomId}/>
+        <button type="submit" onClick={()=>this.props.onJoinGame(this.state.role, this.state.roomId)}>Join Game</button>
       </section>
     );
   }
