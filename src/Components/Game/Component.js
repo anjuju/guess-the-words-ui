@@ -18,66 +18,45 @@ class Game extends React.Component {
     // board: [[{"word":"TEST","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
     role: {},
     roomId: '',
+    alert: '',
   }
    
   componentDidMount() {
-    // fetch(`http://localhost:8080/board`)
-    //   .then(res => {
-    //     // console.log(res);
-    //     return res.json() 
-    //   }) // parse JSON from request
-    //   .then(resultData => {
-    //     //console.log('resultData', resultData);
-    //     if (resultData.message === "please create a new board first!") {
-    //       fetch('http://localhost:8080/board', {
-    //         method: 'post',
-    //         headers: {
-    //           'Accept': 'application/json, text/plain, */*',
-    //           'Content-Type': 'application/json'
-    //         },
-    //         //body: JSON.stringify(data)
-    //       })
-    //         .then(res=>res.json())
-    //         .then(res => {
-    //           this.setState({ board: res.board})
-    //         });
-    //     } else {
-    //       this.setState({ board: resultData.board})
-    //     }
-    // });
     socket.on('updateBoard', data => {
-      // console.log('updateBoard', data);
-      if (data) {
+      if (data.role) {
         this.setState({
-          board: data.board
+          role: data.role,
         });
-      } else {
-        this.setState({
-          board: null
-        });
-      }  
+      } 
+      this.setState({
+        board: data.board
+      });
+      // setTimeout(()=>console.log('state', this.state));
     });
   }
   
   handleRoleSubmit = (role) => {   
     if (!role.type) {
-      alert('Please choose a Role');
+      this.setState({
+        alert: 'Please choose a Role'
+      });
     } else {
       this.setState({
         role
       });
-      // setTimeout(()=>console.log("role (game):", this.state.role),0);
     }
   }
 
   enterGame = (data) => {
     if (data.error && this.state.role.type) {
-      alert(data.error);
+      this.setState({
+        alert: data.error
+      });
     } else if (data.board) {
       console.log('entering game', data.roomId);
       this.setState({
         roomId: data.roomId,
-        board: data.board
+        board: data.board,
       });
     }
   }
@@ -91,8 +70,10 @@ class Game extends React.Component {
 
   handleJoinGame = (role, roomId) => {
     this.handleRoleSubmit(role);
-    if (roomId === '') {
-      alert('Please enter a Room ID');
+    if (roomId === '' && this.state.roomId === '') {
+      this.setState({
+        alert: 'Please enter a Room ID'
+      });
     } else {
       console.log('joining game', roomId);
       socket.emit('joinGame', { role, roomId });
@@ -114,28 +95,31 @@ class Game extends React.Component {
       alert("The assassin was clicked! Game over!");
     }
 
-    socket.emit('clickTile', {
-      roomId: this.state.roomId,
-      board: this.state.board,
-      coord,
+    const { roomId, board } = this.state;
+    socket.emit('clickTile', { 
+      roomId,
+      board
     });
   }
 
   handleNewBoard = () => {
-    // fetch('http://localhost:8080/board', {
-    //   method: 'DELETE',
-    //   headers: {
-    //     'Accept': 'application/json, text/plain, */*',
-    //     'Content-Type': 'application/json'
-    //   }
-    // })
-    //   .then(res=>res.json())
-    //   .then(res => {
-    //     window.location.reload();
-    //   });
-    socket.emit('getNewBoard', { roomId: this.state.roomId });
+    const { roomId } = this.state;
+    socket.emit('getNewBoard', { roomId });
     this.setState({
-      role: {}
+      role: {},
+      alert: ''
+    });
+    socket.on('updateBoard', data => {
+      // console.log('updateBoard', data);
+      if (data.role) {
+        this.setState({
+          role: data.role,
+        });
+      } 
+      this.setState({
+        board: data.board
+      });
+      setTimeout(()=>console.log('state', this.state));
     });
   }
 
@@ -158,15 +142,18 @@ class Game extends React.Component {
     //setTimeout(()=>console.log("reveal board:", this.state.board),0);
   }
 
+  leaveRoom = () => {
+    const { roomId } = this.state;
+    socket.emit('leaveRoom', { roomId });
+    this.setState({
+      role: {},
+      roomId: '',
+      board: null,
+      alert: ''
+    });
+  }
+
   render() {
-
-    // let status;
-    // // if (winner) {
-    // //   status = "Winner: " + winner;
-    // // } else {
-    //   status = "Next team: " + (this.state.redIsNext ? "red" : "blue");
-    // // }
-
     if (this.state.role.type && this.state.board) {
       return (
         <div className="game">
@@ -176,10 +163,11 @@ class Game extends React.Component {
             onClick={coord => this.updateBoard(coord)}
             role={this.state.role}
           />
-          <div className="gameID">Room ID: {this.state.roomId}</div>
+          <div className="gameID">Currently in: {this.state.roomId}</div>
           <div className="game-btns">
             <button onClick={this.handleNewBoard}> Change Board </button>
             <button onClick={this.revealBoard}> Reveal Board </button>
+            <button onClick={this.leaveRoom}> Leave Room </button>
           </div>
           
         </div>
@@ -187,8 +175,9 @@ class Game extends React.Component {
     } else {
       return (
         <div className="start-game">
+          <div className="extra-info">{this.state.alert}</div>
           <Role 
-          state={this.state}
+          roomId={this.state.roomId}
           onNewGame={this.handleCreateNewGame} 
           onJoinGame={this.handleJoinGame}
           />

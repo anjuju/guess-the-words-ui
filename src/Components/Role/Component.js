@@ -53,9 +53,10 @@ class Role extends React.Component {
           </li>
         </ul>
         <div className="game-btns">
-          <button type="submit" onClick={()=>this.props.onNewGame(this.state.role)}>New Game</button>
+          {(this.props.roomId === '') && <button type="submit" onClick={()=>this.props.onNewGame(this.state.role)}>New Game</button>}
           <button type="submit" onClick={()=>this.props.onJoinGame(this.state.role, this.state.roomId)}>Join Game</button>
-          <input className="room-id" type="text" placeholder="room-ID" onChange={this.handleRoomId}/>
+          {(this.props.roomId === '') && <input className="room-id" type="text" placeholder="room-ID" onChange={this.handleRoomId}/>}
+          {(this.props.roomId !== '') && <div className="gameID">Currently in: {this.props.roomId}</div> }
         </div>
       </section>
     );
