@@ -15,41 +15,95 @@ const socket = socketIOClient(socketEndPoint);
 class Game extends React.Component {
   
   state = {
-    board: [[{"word":"POLE","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
+    // board: [[{"word":"TEST","color":"blue","toReveal":false},{"word":"SUIT","color":"neutral","toReveal":false},{"word":"SLIP","color":"black","toReveal":false},{"word":"HAND","color":"red","toReveal":false},{"word":"BUGLE","color":"neutral","toReveal":false}],[{"word":"VAN","color":"red","toReveal":false},{"word":"LEPRECHAUN","color":"blue","toReveal":false},{"word":"SERVER","color":"blue","toReveal":false},{"word":"ROUND","color":"blue","toReveal":false},{"word":"DISEASE","color":"red","toReveal":false}],[{"word":"SCREEN","color":"red","toReveal":false},{"word":"THEATER","color":"red","toReveal":false},{"word":"DIAMOND","color":"neutral","toReveal":false},{"word":"NINJA","color":"red","toReveal":false},{"word":"CASINO","color":"blue","toReveal":false}],[{"word":"MAPLE","color":"red","toReveal":false},{"word":"STADIUM","color":"red","toReveal":false},{"word":"COTTON","color":"blue","toReveal":false},{"word":"CODE","color":"blue","toReveal":false},{"word":"EMBASSY","color":"blue","toReveal":false}],[{"word":"FISH","color":"neutral","toReveal":false},{"word":"FAIR","color":"neutral","toReveal":false},{"word":"SCORPION","color":"red","toReveal":false},{"word":"NAIL","color":"neutral","toReveal":false},{"word":"LIFE","color":"neutral","toReveal":false}]],
     role: {},
     // roomId: '',
   }
    
   componentDidMount() {
-    fetch(`http://localhost:8080/board`)
-      .then(res => {
-        // console.log(res);
-        return res.json() 
-      }) // parse JSON from request
-      .then(resultData => {
-        //console.log('resultData', resultData);
-        if (resultData.message === "please create a new board first!") {
-          fetch('http://localhost:8080/board', {
-            method: 'post',
-            headers: {
-              'Accept': 'application/json, text/plain, */*',
-              'Content-Type': 'application/json'
-            },
-            //body: JSON.stringify(data)
-          })
-            .then(res=>res.json())
-            .then(res => {
-              this.setState({ board: res.board})
-            });
-        } else {
-          this.setState({ board: resultData.board})
-        }
+    // fetch(`http://localhost:8080/board`)
+    //   .then(res => {
+    //     // console.log(res);
+    //     return res.json() 
+    //   }) // parse JSON from request
+    //   .then(resultData => {
+    //     //console.log('resultData', resultData);
+    //     if (resultData.message === "please create a new board first!") {
+    //       fetch('http://localhost:8080/board', {
+    //         method: 'post',
+    //         headers: {
+    //           'Accept': 'application/json, text/plain, */*',
+    //           'Content-Type': 'application/json'
+    //         },
+    //         //body: JSON.stringify(data)
+    //       })
+    //         .then(res=>res.json())
+    //         .then(res => {
+    //           this.setState({ board: res.board})
+    //         });
+    //     } else {
+    //       this.setState({ board: resultData.board})
+    //     }
+    // });
+    socket.on('updateBoard', data => {
+      console.log('updateBoard', data);
+      if (data) {
+        this.setState({
+          board: data.board
+        });
+      } else {
+        this.setState({
+          board: null
+        });
+      }  
     });
-    socket.on('tileClicked', data => {
+  }
+
+  handleCreateNewGame = (role) => {
+    console.log('creating new game');
+    socket.emit('createGame', { role: this.state.role });
+    socket.on('newGame', data => {
+      if (data.error) {
+        alert(data.error);
+      } else if (data.board) {
+        this.setState({
+          board: data.board
+        });
+        this.handleRoleSubmit(role);
+      }
+    });
+
+  }
+
+  handleJoinGame = (role) => {
+    // console.log('joining room', room);
+    console.log('joining game');
+    socket.emit('joinGame', { role });
+    // this.setState({
+    //   room
+    // });
+    socket.on('joiningGame', data => {
+      if (data.error) {
+        alert(data.error);
+      } else if (data.board) {
+        this.setState({
+          board: data.board
+        });
+        this.handleRoleSubmit(role);
+      }
+    });
+    
+  }
+
+  handleRoleSubmit = (role) => {   
+    if (!role.type) {
+      alert('Please choose a role');
+    } else {
       this.setState({
-        board: data.board
+        role
       });
-    })
+      // setTimeout(()=>console.log("role (game):", this.state.role),0);
+    }
   }
 
   updateBoard = (coord) => {
@@ -75,54 +129,21 @@ class Game extends React.Component {
   }
 
   handleNewBoard = () => {
-    fetch('http://localhost:8080/board', {
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(res=>res.json())
-      .then(res => {
-        window.location.reload();
-      });
-  }
-
-  handleRoleSubmit = (role) => {   
-    if (!role.type) {
-      alert('Please choose a role');
-    } else {
-      this.setState({
-        role
-      });
-      // setTimeout(()=>console.log("role (game):", this.state.role),0);
-    }
-  }
-
-  handleCreateNewGame = (role) => {
-    console.log('creating new game');
-    socket.emit('createGame', { role: this.state.role });
-    // socket.on('newGame', data => {
-    //   this.setState({
-    //     room: data.room
+    // fetch('http://localhost:8080/board', {
+    //   method: 'DELETE',
+    //   headers: {
+    //     'Accept': 'application/json, text/plain, */*',
+    //     'Content-Type': 'application/json'
+    //   }
+    // })
+    //   .then(res=>res.json())
+    //   .then(res => {
+    //     window.location.reload();
     //   });
-    // });
-    this.handleRoleSubmit(role);
-  }
-
-  handleJoinGame = (role) => {
-    // console.log('joining room', room);
-    socket.emit('joinGame', { role });
-    // this.setState({
-    //   room
-    // });
-    // already set this on componentDidMount 
-    // socket.on('joiningGame', data => {
-    //   this.setState({
-    //     board: data.board
-    //   })
-    //})
-    this.handleRoleSubmit(role);
+    socket.emit('getNewBoard');
+    this.setState({
+      role: {}
+    });
   }
 
   revealBoard = () => {
@@ -153,7 +174,7 @@ class Game extends React.Component {
     //   status = "Next team: " + (this.state.redIsNext ? "red" : "blue");
     // // }
 
-    if (this.state.role.type) {
+    if (this.state.role.type && this.state.board) {
       return (
         <div className="game">
           <div className={`role ${this.state.role.color}`}>Role: {this.state.role.color} {this.state.role.type}</div>
