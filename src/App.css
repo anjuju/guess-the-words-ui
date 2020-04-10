@@ -21,6 +21,10 @@
   color: white; 
 }
 
+.App div {
+  margin: 1.5vw;
+}
+
 .red {
   background-color: var(--red);
 }
@@ -47,6 +51,3 @@ button {
   /* margin: 1vw; */
 }
 
-div {
-  margin: 1.5vw;
-}

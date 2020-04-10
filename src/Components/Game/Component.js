@@ -46,7 +46,7 @@ class Game extends React.Component {
     //     }
     // });
     socket.on('updateBoard', data => {
-      console.log('updateBoard', data);
+      // console.log('updateBoard', data);
       if (data) {
         this.setState({
           board: data.board
@@ -59,42 +59,16 @@ class Game extends React.Component {
     });
   }
 
-  handleCreateNewGame = (role) => {
-    console.log('creating new game');
-    socket.emit('createGame', { role: this.state.role });
-    socket.on('newGame', data => {
-      if (data.error) {
-        alert(data.error);
-      } else if (data.board) {
-        this.setState({
-          board: data.board
-        });
-        this.handleRoleSubmit(role);
-      }
-    });
-
+  enterGame = (data) => {
+    if (data.error && this.state.role.type) {
+      alert(data.error);
+    } else if (data.board) {
+      this.setState({
+        board: data.board
+      });
+    }
   }
-
-  handleJoinGame = (role) => {
-    // console.log('joining room', room);
-    console.log('joining game');
-    socket.emit('joinGame', { role });
-    // this.setState({
-    //   room
-    // });
-    socket.on('joiningGame', data => {
-      if (data.error) {
-        alert(data.error);
-      } else if (data.board) {
-        this.setState({
-          board: data.board
-        });
-        this.handleRoleSubmit(role);
-      }
-    });
-    
-  }
-
+  
   handleRoleSubmit = (role) => {   
     if (!role.type) {
       alert('Please choose a role');
@@ -104,6 +78,23 @@ class Game extends React.Component {
       });
       // setTimeout(()=>console.log("role (game):", this.state.role),0);
     }
+  }
+
+  handleCreateNewGame = (role) => {
+    this.handleRoleSubmit(role);
+    //console.log('creating new game');
+    socket.emit('createGame', { role });
+    socket.on('creatingGame', data => this.enterGame(data));
+  }
+
+  handleJoinGame = (role) => {
+    this.handleRoleSubmit(role);
+    // console.log('joining game', room);
+    socket.emit('joinGame', { role });
+    // this.setState({
+    //   room
+    // });
+    socket.on('joiningGame', data => this.enterGame(data));
   }
 
   updateBoard = (coord) => {
@@ -118,7 +109,6 @@ class Game extends React.Component {
     
     if (newBoard[coord.x][coord.y].color === "black") {
       alert("The assassin was clicked! Game over!");
-      this.revealBoard();
     }
 
     socket.emit('clickTile', {

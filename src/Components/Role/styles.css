@@ -13,6 +13,9 @@
 
   list-style: none;
   align-items: center;
+
+  padding-inline-start: 0px; 
+  padding: 0vw 2vw;
 }
 
 .role {
