@@ -28,6 +28,11 @@
   cursor: pointer;
 }
 
+.room-id {
+  font-size: 2vw;
+  width: 12vw;
+}
+
 input[type="radio"] {
   width: 1vw;
   height: 1vw;

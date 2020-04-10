@@ -6,7 +6,7 @@ class Role extends React.Component {
 
   state = {
     role: {},
-    // roomId: '',
+    roomId: '',
   }
 
   handleRoleClick = (event) => {
@@ -24,11 +24,11 @@ class Role extends React.Component {
     // setTimeout(()=>console.log("role (state):", this.state.role),0);
   }
 
-  // handleRoomId = (event) => {
-  //   this.setState({
-  //     roomId: event.target.value
-  //   })
-  // }
+  handleRoomId = (event) => {
+    this.setState({
+      roomId: event.target.value
+    })
+  }
 
   render() {
     return (
@@ -54,8 +54,8 @@ class Role extends React.Component {
         </ul>
         <div className="game-btns">
           <button type="submit" onClick={()=>this.props.onNewGame(this.state.role)}>New Game</button>
-          {/* <input type="text" placeholder="Enter Game ID" onChange={this.handleRoomId}/> */}
-          <button type="submit" onClick={()=>this.props.onJoinGame(this.state.role)}>Join Game</button>
+          <button type="submit" onClick={()=>this.props.onJoinGame(this.state.role, this.state.roomId)}>Join Game</button>
+          <input className="room-id" type="text" placeholder="room-ID" onChange={this.handleRoomId}/>
         </div>
       </section>
     );
