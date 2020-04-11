@@ -22,18 +22,23 @@
   opacity: 50%;
 }
 
-/* .red {
-  background: red
+.dull {
+  opacity: 50%;
 }
 
-.blue {
-  background: blue
+.red-font {
+  color: var(--red);
 }
 
-.neutral {
-  background: white
+.blue-font {
+  color: var(--blue);
 }
 
-.black {
-  background: black
-} */
+.neutral-font {
+  color: var(--neutral);
+}
+
+.black-font {
+  background: var(--assassin);
+  background-size: 100% 100%;
+}

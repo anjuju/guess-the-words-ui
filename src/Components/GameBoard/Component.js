@@ -11,6 +11,7 @@ const GameBoard = (props) => {
         key={`${coord.x}${coord.y}`}
         tile={tile}
         onClick={() => props.onClick(coord)}
+        roleType={props.role.type}
       />
     );
   };

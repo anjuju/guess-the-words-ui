@@ -10,15 +10,15 @@ class Role extends React.Component {
   }
 
   handleRoleClick = (event) => {
-    let roleColor;
-    let roleType;
+    let color;
+    let type;
 
-    (event.target.id === 'redSpyMaster' || event.target.id === 'redGuesser') ? roleColor = 'red' : roleColor = 'blue';
-    (event.target.id === 'redSpyMaster' || event.target.id === 'blueSpyMaster') ? roleType = 'spymaster' : roleType = 'guesser';
+    (event.target.id === 'redSpyMaster' || event.target.id === 'redGuesser') ? color = 'red' : color = 'blue';
+    (event.target.id === 'redSpyMaster' || event.target.id === 'blueSpyMaster') ? type = 'spymaster' : type = 'guesser';
     this.setState({
       role : {
-        type: roleType,
-        color: roleColor
+        color,
+        type
       }
     });
     // setTimeout(()=>console.log("role (state):", this.state.role),0);

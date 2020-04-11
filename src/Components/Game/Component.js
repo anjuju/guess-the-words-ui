@@ -57,13 +57,14 @@ class Game extends React.Component {
       this.setState({
         roomId: data.roomId,
         board: data.board,
+        alert: ''
       });
     }
   }
 
   handleCreateNewGame = (role) => {
     this.handleRoleSubmit(role);
-    console.log('creating new game');
+    //console.log('creating new game');
     socket.emit('createGame', { role });
     socket.on('creatingGame', data => this.enterGame(data));
   }
@@ -75,7 +76,7 @@ class Game extends React.Component {
         alert: 'Please enter a Room ID'
       });
     } else {
-      console.log('joining game', roomId);
+      //console.log('joining game', roomId);
       socket.emit('joinGame', { role, roomId });
       socket.on('joiningGame', data => this.enterGame(data));
     }
@@ -83,16 +84,13 @@ class Game extends React.Component {
 
   updateBoard = (coord) => {
     const newBoard = this.state.board.slice();
-    // if (!newBoard[coord.x][coord.y].toReveal) {
-    //   newBoard[coord.x][coord.y].toReveal = true;
-    // }
     newBoard[coord.x][coord.y].toReveal = !newBoard[coord.x][coord.y].toReveal;
     this.setState({
       board: newBoard,
     });
     
     if (newBoard[coord.x][coord.y].color === "black") {
-      alert("The assassin was clicked! Game over!");
+      alert("The assassin was clicked! Game over");
     }
 
     const { roomId, board } = this.state;
@@ -105,22 +103,6 @@ class Game extends React.Component {
   handleNewBoard = () => {
     const { roomId } = this.state;
     socket.emit('getNewBoard', { roomId });
-    this.setState({
-      role: {},
-      alert: ''
-    });
-    socket.on('updateBoard', data => {
-      // console.log('updateBoard', data);
-      if (data.role) {
-        this.setState({
-          role: data.role,
-        });
-      } 
-      this.setState({
-        board: data.board
-      });
-      setTimeout(()=>console.log('state', this.state));
-    });
   }
 
   revealBoard = () => {
@@ -148,8 +130,7 @@ class Game extends React.Component {
     this.setState({
       role: {},
       roomId: '',
-      board: null,
-      alert: ''
+      board: null
     });
   }
 
