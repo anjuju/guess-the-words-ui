@@ -1,8 +1,5 @@
 FROM node:12.16-alpine AS builder
-
-
 WORKDIR /usr/src/app
-
 
 COPY . .
 RUN npm install react-scripts -g --silent
